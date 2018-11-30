@@ -24,7 +24,7 @@ app.use('*', (err, req, res, next) => {
 	// hier heb ik de error
 	console.dir(err)
 	// -> return response naar caller
-	res.status(500).json({error: err}).end()
+	res.status(404).json({error: err}).end()
 })
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
