@@ -5,8 +5,8 @@ node_js:
   - "6"
   - "5"
   - "4"
-  before_script:
+before_script:
   - npm install chai chai-http mocha
   - npm install
-  script:
+script:
   - npm test
