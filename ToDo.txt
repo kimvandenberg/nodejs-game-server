@@ -1,0 +1,9 @@
+Huiswerk voor volgende les:
+
+- maak de /games/:id route werkend
+- voeg put en delete routes toe en maak werkend
+
+- bekijk/lees de docs op expressjs.com
+	- getting started
+	- guide, routing t/m errorhandling (templates is optioneel)
+
