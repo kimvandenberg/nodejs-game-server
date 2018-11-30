@@ -17,7 +17,7 @@ describe('Game', () => {
         game.should.have.property('year').equals(2018)
         game.should.not.have.property('password')
 
-        assert.equal(game.name, 'abcd', 'Names do not match')
+        assert.equal(game.name, 'abc', 'Names do not match')
 
         done()
     })
