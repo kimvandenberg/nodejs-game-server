@@ -4,8 +4,5 @@ node_modules
 .idea
 .sonar/
 coverage/
-package-lock.json
-static
-resources
 
 *.code-workspace

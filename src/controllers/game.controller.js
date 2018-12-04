@@ -1,5 +1,6 @@
 const Game = require('../models/game.model')
 const ApiError = require('../models/apierror.model')
+const pool = require('../config/db')
 
 let games = [
 	new Game('Battlefield 5', 'EA', 2018, 'FPS')
@@ -12,16 +13,26 @@ games.forEach((item) => {
 
 module.exports = {
 
-	getAll(req, res) {
+	getAll(req, res, next) {
 		console.log('gameController.get called')
-		res.status(200).json(games).end()
+
+		// For pool initialization, see above
+		pool.query("SELECT * FROM games", function(err, rows, fields) {
+			// Connection is automatically released when query resolves
+			if(err) {
+				console.log(err)
+				return next(new ApiError(err, 500))
+			}
+			res.status(200).json({ result: rows}).end()
+
+		 })
 	},
 
 	getById(req, res, next) {
 		const id = req.params.gameId
 		console.log('id = ' + id)
 
-		if(id < 0 || id > games.length) {
+		if(id < 0 || id > games.length-1){
 			next(new ApiError('Id does not exist', 404))
 		} else {
 			res.status(200).json(games[id]).end()

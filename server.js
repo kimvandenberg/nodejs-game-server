@@ -11,20 +11,20 @@ app.use(bodyParser.json())
 
 const port = process.env.PORT || 3000
 
-// Reguliere routing
+// reguliere routing
 app.use('/api', gameRoutes)
 
-// Handler voor niet-bestaande routes
+// handler voor niet-bestaande routes
 app.use('*', (req, res, next) => {
 	next(new ApiError('Non-existing endpoint', 404))
 })
 
-// Handler voor errors
+// handler voor errors
 app.use('*', (err, req, res, next) => {
 	// hier heb ik de error
 	console.dir(err)
 	// -> return response naar caller
-	res.status(404).json({error: err}).end()
+	res.status(err.code).json({error: err}).end()
 })
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
