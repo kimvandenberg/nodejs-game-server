@@ -55,12 +55,25 @@ module.exports = {
 		console.dir(req.body)
 
 		// add game to array of games
-		const game = new Game(req.body.name, req.body.producer, req.body.year, req.body.type)
-		games.push(game)
+		// const game = new Game(req.body.name, req.body.producer, req.body.year, req.body.type)
+		// games.push(game)
 
-		res.status(200).json({ 
-			message: req.body.name + ' succesvol toegevoegd'
-		}).end()
+		// res.status(200).json({ 
+		// 	message: req.body.name + ' succesvol toegevoegd'
+		// }).end()
+
+		// For pool initialization, see above
+		pool.query("INSERT INTO games (name, producer, year, type) VALUES (?, ?, ?, ?)",[req.body.name, req.body.producer, req.body.year, req.body.type], function(err, rows, fields) {
+			// Connection is automatically released when query resolves
+			if(err) {
+				console.log(err)
+				return next(new ApiError(err, 500))
+			}
+			res.status(200).json({ 
+				message: req.body.name + ' is added'
+			}).end()
+
+		 })
 	}
 
 }
