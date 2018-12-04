@@ -32,11 +32,22 @@ module.exports = {
 		const id = req.params.gameId
 		console.log('id = ' + id)
 
-		if(id < 0 || id > games.length-1){
-			next(new ApiError('Id does not exist', 404))
-		} else {
-			res.status(200).json(games[id]).end()
-		}
+		// if(id < 0 || id > games.length-1){
+		// 	next(new ApiError('Id does not exist', 404))
+		// } else {
+		// 	res.status(200).json(games[id]).end()
+		// }
+
+		// For pool initialization, see above
+		pool.query("SELECT * FROM games where games.id = ?",[id] , function(err, rows, fields) {
+			// Connection is automatically released when query resolves
+			if(err) {
+				console.log(err)
+				return next(new ApiError(err, 500))
+			}
+			res.status(200).json({ result: rows}).end()
+
+		 })
 	},
 
 	addNewGame(req, res) {
