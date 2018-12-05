@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `games` (
 		'COMBAT',
 		'UNKNOWN'
 	) NOT NULL DEFAULT 'UNKNOWN',
-	`LaatstGewijzigdOp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	`lastUpdated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	PRIMARY KEY (`ID`)
 ) 
 ENGINE = InnoDB;
@@ -36,3 +36,22 @@ INSERT INTO `games` (`title`, `producer`, `year`, `type`) VALUES
 ('Battlefield 5', 'EA', 2018, 'FIRST_PERSON_SHOOTER'),
 ('Fortnite', 'Epic Games', 2017, 'THIRD_PERSON_SHOOTER'),
 ('Minecraft', 'Mojang', 2009, 'ADVENTURE');
+
+
+-- -----------------------------------------------------
+-- Table `users`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `users` ;
+CREATE TABLE IF NOT EXISTS `users` (
+	`ID` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`firstname` VARCHAR(32) NOT NULL,
+	`lastname` VARCHAR(32) NOT NULL,
+	`email` VARCHAR(64) NOT NULL UNIQUE,
+	`password` VARCHAR(32) NOT NULL,
+	`lastUpdated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	PRIMARY KEY (`ID`)
+) 
+ENGINE = InnoDB;
+
+INSERT INTO `users` (`firstname`, `lastname`, `email`, `password`) VALUES 
+('kim', 'vandenberg', 'kb@server.nl', 'secret');
