@@ -15,6 +15,7 @@ module.exports = {
 
 	getAll(req, res, next) {
 		console.log('gameController.get called')
+		// console.log("klant id: " + req.user.id)
 
 		// For pool initialization, see above
 		pool.query("SELECT * FROM games", function(err, rows, fields) {

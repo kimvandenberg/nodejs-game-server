@@ -5,7 +5,7 @@ const dbconfig = {
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'gamedb_user',
   database: process.env.DB_DATABASE || 'gamedb',
-  password: process.env.DB_PASSWORD,
+  password: process.env.DB_PASSWORD || 'secret',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0

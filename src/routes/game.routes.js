@@ -3,6 +3,7 @@ const gameController = require('../controllers/game.controller')
 const authController = require('../controllers/auth.controller')
 
 
+// router.get('/games', authController.validateJWT, gameController.getAll)
 router.get('/games', gameController.getAll)
 router.get('/games/:gameId', gameController.getById)
 router.post('/games', gameController.addNewGame)
