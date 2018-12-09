@@ -93,6 +93,10 @@ module.exports = {
 				console.log(err)
 				return next(new ApiError(err, 500))
 			}
+			console.log(rows.affectedRows)
+			if(rows.affectedRows == 0) {
+				return next(new ApiError('Object not found', 404))
+			}
 			res.status(200).json({ 
 				message: req.body.title + ' is updated'
 			}).end()

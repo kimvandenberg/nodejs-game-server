@@ -56,6 +56,7 @@ module.exports = {
 						console.log(err)
 						return next(new ApiError('Token kan niet worden gemaakt', 500))
 					}
+					
 					console.log('Token is validated')
 		
 					res.status(200).json({
@@ -86,7 +87,8 @@ module.exports = {
 	},
 
 	validateJWT(req, res, next) {
-		const token = req.header('x-access-token')
+		const token = require('../../test/authentication.test').token
+		// const token = req.header('x-access-token')
 		if(!token) {
 			return next(new ApiError('Required token is missing', 404))
 		}
@@ -96,6 +98,7 @@ module.exports = {
 			if(err) {
 				return next(new ApiError('Invalid token', 404))
 			}
+			console.log('---------------------------------------------------------------')
 			console.log('Token is validated')
 			console.dir(payload)
 			

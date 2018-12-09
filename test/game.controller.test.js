@@ -1,156 +1,281 @@
-const chai = require('chai')
-const chaiHttp = require('chai-http')
-const server = require('../server')
-// const token = require('./authentication.routes.test')
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const server = require('../server');
 
-chai.should()
-chai.use(chaiHttp)
+chai.should();
+chai.use(chaiHttp);
 
-const endpointToTest = '/api/games'
+const endpointToTest = '/api/games';
 
 describe('Games API POST', () => {
     it('should return a valid game when posting a valid object', (done) => {
- 
+
+        const token = require('./authentication.test').token;
+
+        console.log('TOKENA ' + token)
         chai.request(server)
             .post(endpointToTest)
+            .set('x-access-token', token)
             .send({
-                'name': '  somename  ',
-                'producer': '  someproducer   ',
-                'year': 2020,
-                'type': ' sometype '
+                'title': 'gameName',
+                'producer': 'producer',
+                'year': 2018,
+                'type': 'typeOfGame'
             })
             .end((err, res) => {
                 res.should.have.status(200)
                 res.body.should.be.a('object')
 
-                const Games = res.body
-                Games.should.have.property('name').that.is.an('object')
+                //Get object from body the response.
+                const Games = res.body;
+                
+                const util = require('util')
+                console.log(123 + util.inspect(res.body, false, null, true))
+                
+                //Check if properties are still existent in object returned.
+                Games.should.have.property('message');
 
-                const name = Games.name
-                name.should.have.property('firstname').equals('FirstName')
-                name.should.have.property('lastname').equals('LastName')
-                Games.should.have.property('email').equals('user@host.com')
-                Games.should.not.have.property('password')
-                done()
+                //Do the properties still match?
+                Games.message.should.equal('gameName is added');
+                
+                done();
         })
-    })
+    });
 
-    it('should throw an error when using invalid JWT token', (done) => {
-        chai.request(server)
-            .post(endpointToTest)
-            .set('x-access-token', 'in.valid.token')
-            .send({
-                'firstname': '  FirstName  ',
-                'lastname': '  LastName   ',
-                'email': ' user@host.com ',
-                'password': ' secret '
-            })
-            .end((err, res) => {
-                res.should.have.status(401)
-                res.body.should.be.a('object')
-                const error = res.body
-                error.should.have.property('message')
-                error.should.have.property('code').equals(401)
-                error.should.have.property('datetime')
-                done()
-            })
-    })
+    it('should return a 500 error on posting an invalid object.', (done) => {
+        const token = require('./authentication.test').token;
 
-    it('should throw an error when no firstname is provided', (done) => {
-        const token = require('./authentication.test').token
+        console.log('before exception tk=' + token);
         chai.request(server)
             .post(endpointToTest)
             .set('x-access-token', token)
             .send({
-                'lastname': '  LastName   ',
-                'email': ' user@host.com ',
-                'password': ' secret '
+                'name': 'gameName',
             })
             .end((err, res) => {
-                res.should.have.status(422)
+                res.should.have.status(500)
+
                 res.body.should.be.a('object')
 
-                const error = res.body
-                error.should.have.property('message')
-                error.should.have.property('code').equals(422)
-                error.should.have.property('datetime')
-
-                done()
-            })
-    })
-
-    it.skip('should throw an error when no valid firstname is provided', (done) => {
-        // Write your test here
-        done()
-    })
-
-    it.skip('should throw an error when no lastname is provided', (done) => {
-        // Write your test here
-        done()
-    })
-
-    it.skip('should throw an error when no valid lastname is provided', (done) => {
-        // Write your test here
-        done()
-    })
-
+                done();
+        })
+    });
 })
 
-describe('Games API GET', () => {
-    it.skip('should return an array of Gamess', (done) => {
-        // Write your test here
-        done()
-    })
+describe('Calling an invalid route or failed call, should return an object of type ApiError', () => {
 
+    it('should return a 404 error.', (done) => {
+
+        chai.request(server)
+            .get('/api/gameszz')
+            .send()
+            .end((err, res) => {
+                res.should.have.status(404)
+
+                res.body.should.be.a('object');
+
+                const error = res.body.error;
+
+                const util = require('util')
+                console.log(123 + util.inspect(res.body, false, null, true))
+
+                //Check if properties are still existent in object returned.
+                error.should.have.property('message');
+                error.should.have.property('code');
+                error.should.have.property('date');
+
+                //Check if values match the expected return value.
+                error.message.should.equal('Non-existing endpoint');
+                error.code.should.equal(404);
+
+                done();
+        })
+    });
 })
 
 describe('Games API PUT', () => {
-    it('should return the updated Games when providing valid input', (done) => {
-        const token = require('./authentication.test').token
-        // console.log('token = ' + token)
+
+    it('should return a valid game when puting a valid object', (done) => {
+        const token = require('./authentication.test').token;
+
         chai.request(server)
-            .put(endpointToTest + '/0')
+            .put(endpointToTest + "/update/2")
             .set('x-access-token', token)
             .send({
-                'firstname': '  NewFirstName  ',
-                'lastname': '  NewLastName   ',
-                'email': ' user@host.com ',
-                'password': ' secret '
+                'title': 'gameName',
+                'producer': 'producer',
+                'year': 2018,
+                'type': 'typeOfGamee'
             })
             .end((err, res) => {
-                // Check: 
-                // Verify that the Games that we get is the updated Games.
                 res.should.have.status(200)
                 res.body.should.be.a('object')
 
-                const response = res.body
-                response.should.have.property('name').which.is.an('object')
-                const name = response.name
-                name.should.have.property('firstname').equals('NewFirstName')
-                name.should.have.property('lastname').equals('NewLastName')
+                const Games = res.body;
+                
+                //Check if properties are still existent in object returned.
+                Games.should.have.property('message');
 
-                // Double check:
-                // Send a GET-request to verify that the Games has been updated.
-                chai.request(server)
-                    .get('/api/Gamess')
-                    .set('x-access-token', token)
-                    .end((err, res) => {
-                        res.should.have.status(200)
-                        res.body.should.be.an('array')
-                        const result = res.body
-                        result[0].name.should.have.property('firstname').equals('NewFirstName')
-                        result[0].name.should.have.property('lastname').equals('NewLastName')
 
-                        done()
-                    })
+                //Do the properties still match?
+                Games.message.should.equal('gameName is updated');
+
+                
+                //debug
+                //console.dir(res.body);
+                
+                done();
+        })
+    });
+
+    it('should return a 404 error that object cannot be modified as it is non existent', (done) => {
+        const token = require('./authentication.test').token;
+
+        chai.request(server)
+            .put(endpointToTest + "/update/5345436660")
+            .set('x-access-token', token)
+            .send({
+                'title': 'gameName',
+                'producer': 'gameProducer',
+                'year': 2020,
+                'type': 'typeOfGame'
             })
-    })
+            .end((err, res) => {
+                const util = require('util')
+                console.log(123 + util.inspect(res.body, false, null, true))
+
+                res.should.have.status(404)
+                res.body.should.be.a('object')
+
+                const error = res.body.error;
+                
+                //Check if properties are still existent in object returned.
+                error.should.have.property('message');
+                error.should.have.property('code');
+                error.should.have.property('date');
+
+                // //Do the properties still match?
+                error.message.should.equal('Object not found');
+                error.code.should.equal(404);
+
+
+                done();
+        })
+    });
 })
 
-describe('Games API DELETE', () => {
-    it.skip('should return http 200 when deleting a Games with existing id', (done) => {
-        // Write your test here
-        done()
-    })
 
+describe('Games API GetAll', () => {
+
+    it('should return a valid array of games (x) item', (done) => {
+        const token = require('./authentication.test').token;
+
+        chai.request(server)
+            .get(endpointToTest)
+            .set('x-access-token', token)
+            .send()
+            .end((err, res) => {
+                res.should.have.status(200)
+                res.body.should.be.a('object')
+
+                console.dir(res.body);
+                //Take the first element;
+                const Games = res.body;
+
+                for(var i = 0; i < Games.length; i++){
+
+                    //Object games consists out of (name, producer, year, type)
+                    if(Games[i].title && Games[i].producer && Games[i].year  && Games[i].type){
+
+                        //Check if properties are still existent in object returned.
+                        Games[i].should.have.property('title');
+                        Games[i].should.have.property('producer');
+                        Games[i].should.have.property('year');
+                        Games[i].should.have.property('type');
+                    }
+                }
+                done();
+        })
+    });
+})
+
+describe('Games API GetById', () => {
+
+    it('should return a valid game when getting object', (done) => {
+        const token = require('./authentication.test').token;
+ 
+        chai.request(server)
+            .get(endpointToTest + '/1')
+            .set('x-access-token', token)
+            .send()
+            .end((err, res) => {
+                const util = require('util')
+                console.log(123 + util.inspect(res.body, false, null, true))
+
+                res.should.have.status(200)
+                res.body.should.be.a('object')
+                const Games = res.body.result;
+
+                done();
+        })
+    });
+})
+
+describe('Games API Delete', () => {
+
+    it('should return status 200 and the message succesfully removed ', (done) => {
+        const token = require('./authentication.test').token;
+ 
+        chai.request(server)
+            .del(endpointToTest + '/delete/1')
+            .set('x-access-token', token)
+            .send()
+            .end((err, res) => {
+                console.log('identi' + err)
+                res.should.have.status(200)
+                res.body.should.be.a('object')
+
+                const response = res.body;
+                
+                //Check if properties are still existent in object returned.
+                response.should.have.property('message');
+
+                //Do the properties still match?
+                response.message.should.equal('Game is deleted');
+
+                //console.dir(res.body);
+                done();
+        })
+    });
+})
+
+
+describe('Games API Delete Non Existing', () => {
+
+    it('should return status 404', (done) => {
+        const token = require('./authentication.test').token;
+
+        chai.request(server)
+            .del(endpointToTest + '/10789789700')
+            .set('x-access-token', token)
+            .send()
+            .end((err, res) => {
+                const util = require('util')
+                console.log(123 + util.inspect(res.body, false, null, true))
+                res.should.have.status(404)
+                res.body.should.be.a('object')
+
+                const response = res.body.error;
+                //Check if properties are still existent in object returned.
+                 response.should.have.property('message');
+                 response.should.have.property('code');
+                 response.should.have.property('date');
+
+                // //Do the properties still match?
+                response.message.should.equal('Non-existing endpoint');
+
+                //console.dir(res.body);
+                done();
+        })
+    });
 })
