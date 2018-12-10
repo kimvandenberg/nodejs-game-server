@@ -12,15 +12,16 @@ describe('Games API POST', () => {
 
         const token = require('./authentication.test').token;
 
-        console.log('TOKENA ' + token)
+        console.log('TOKEN ' + token)
         chai.request(server)
             .post(endpointToTest)
             .set('x-access-token', token)
             .send({
                 'title': 'gameName',
-                'producer': 'producer',
                 'year': 2018,
-                'type': 'typeOfGame'
+                'type': 'typeOfGame',
+                'producerID': 1,
+                'userID': 1
             })
             .end((err, res) => {
                 res.should.have.status(200)
@@ -45,7 +46,6 @@ describe('Games API POST', () => {
     it('should return a 500 error on posting an invalid object.', (done) => {
         const token = require('./authentication.test').token;
 
-        console.log('before exception tk=' + token);
         chai.request(server)
             .post(endpointToTest)
             .set('x-access-token', token)
@@ -54,7 +54,6 @@ describe('Games API POST', () => {
             })
             .end((err, res) => {
                 res.should.have.status(500)
-
                 res.body.should.be.a('object')
 
                 done();
@@ -63,21 +62,23 @@ describe('Games API POST', () => {
 })
 
 describe('Calling an invalid route or failed call, should return an object of type ApiError', () => {
-
     it('should return a 404 error.', (done) => {
 
+        const token = require('./authentication.test').token;
+
         chai.request(server)
-            .get('/api/gameszz')
-            .send()
+            .get('/api/gamesasdasdssss')
+            .set('x-access-token', token)
             .end((err, res) => {
-                res.should.have.status(404)
+            
+                const util = require('util')
+                console.log(123 + util.inspect(res.body, false, null, true))
+
+                // res.should.have.status(404)
 
                 res.body.should.be.a('object');
 
                 const error = res.body.error;
-
-                const util = require('util')
-                console.log(123 + util.inspect(res.body, false, null, true))
 
                 //Check if properties are still existent in object returned.
                 error.should.have.property('message');
@@ -99,32 +100,27 @@ describe('Games API PUT', () => {
         const token = require('./authentication.test').token;
 
         chai.request(server)
-            .put(endpointToTest + "/update/2")
+            .put(endpointToTest + "/update/1")
             .set('x-access-token', token)
             .send({
-                'title': 'gameName',
-                'producer': 'producer',
+                'title': 'gameNamee',
                 'year': 2018,
-                'type': 'typeOfGamee'
+                'type': 'typeOfGamee',
+                'producerID': 2
             })
             .end((err, res) => {
                 res.should.have.status(200)
                 res.body.should.be.a('object')
 
-                const Games = res.body;
+                const Games = res.body
                 
                 //Check if properties are still existent in object returned.
-                Games.should.have.property('message');
-
+                Games.should.have.property('message')
 
                 //Do the properties still match?
-                Games.message.should.equal('gameName is updated');
+                Games.message.should.equal('gameNamee is updated')
 
-                
-                //debug
-                //console.dir(res.body);
-                
-                done();
+                done()
         })
     });
 
@@ -189,9 +185,9 @@ describe('Games API GetAll', () => {
 
                         //Check if properties are still existent in object returned.
                         Games[i].should.have.property('title');
-                        Games[i].should.have.property('producer');
                         Games[i].should.have.property('year');
                         Games[i].should.have.property('type');
+                        Games[i].should.have.property('producerID');
                     }
                 }
                 done();
@@ -227,11 +223,10 @@ describe('Games API Delete', () => {
         const token = require('./authentication.test').token;
  
         chai.request(server)
-            .del(endpointToTest + '/delete/1')
+            .del(endpointToTest + '/delete/2')
             .set('x-access-token', token)
             .send()
             .end((err, res) => {
-                console.log('identi' + err)
                 res.should.have.status(200)
                 res.body.should.be.a('object')
 

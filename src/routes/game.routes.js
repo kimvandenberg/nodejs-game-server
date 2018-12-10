@@ -10,7 +10,7 @@ router.post('/games', gameController.addNewGame)
 router.delete('/games/delete/:id', gameController.deleteGameById)
 router.put('/games/update/:id', gameController.updateGameById) 
 
-router.post('/register', authController.register)
-router.post('/login', authController.login)
+// router.post('/register', authController.register)
+// router.post('/login', authController.login)
 
 module.exports = router

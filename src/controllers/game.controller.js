@@ -2,15 +2,6 @@ const Game = require('../models/game.model')
 const ApiError = require('../models/apierror.model')
 const pool = require('../config/db')
 
-let games = [
-	new Game('Battlefield 5', 'EA', 2018, 'FPS')
-]
-
-// Voorbeeld werken met arrays
-games.forEach((item) => {
-	// doe iets met item
-})
-
 module.exports = {
 
 	getAll(req, res, next) {
@@ -18,7 +9,7 @@ module.exports = {
 		// console.log("klant id: " + req.user.id)
 
 		// For pool initialization, see above
-		pool.query("SELECT * FROM games", function(err, rows, fields) {
+		pool.query("SELECT * FROM games WHERE userID = ?", [req.user.id], function(err, rows, fields) {
 			// Connection is automatically released when query resolves
 			if(err) {
 				console.log(err)
@@ -34,7 +25,7 @@ module.exports = {
 		console.log('id = ' + id)
 
 		// For pool initialization, see above
-		pool.query("SELECT * FROM games where games.id = ?",[id] , function(err, rows, fields) {
+		pool.query("SELECT * FROM games where games.id = ? && games.userID = ?",[id, req.user.id] , function(err, rows, fields) {
 			// Connection is automatically released when query resolves
 			if(err) {
 				console.log(err)
@@ -56,15 +47,16 @@ module.exports = {
 		console.dir(req.body)
 
 		// For pool initialization, see above
-		pool.query("INSERT INTO games (title, producer, year, type) VALUES (?, ?, ?, ?)",[req.body.title, req.body.producer, req.body.year, req.body.type], function(err, rows, fields) {
+		pool.query("INSERT INTO games (title, year, type, producerID, userID) VALUES (?, ?, ?, ?, ?)",[req.body.title, req.body.year, req.body.type, req.body.producerID, req.user.id], function(err, rows, fields) {
 			// Connection is automatically released when query resolves
 			if(err) {
 				console.log(err)
 				return next(new ApiError(err, 500))
+			} else {
+				res.status(200).json({ 
+					message: req.body.title + ' is added'
+				}).end()
 			}
-			res.status(200).json({ 
-				message: req.body.title + ' is added'
-			}).end()
 		 })
 
 		// add game to array of games
@@ -84,8 +76,8 @@ module.exports = {
         // const id = req.params.id
 		
 		// For pool initialization, see above
-		pool.query("UPDATE games SET title = ?, producer = ?, year = ?, type = ? WHERE id = ?",
-			[req.body.title, req.body.producer, req.body.year, req.body.type, req.params.id], 
+		pool.query("UPDATE games SET title = ?, year = ?, type = ?, producerID = ? WHERE id = ? && userID = ?",
+			[req.body.title, req.body.year, req.body.type, req.body.producerID, req.params.id, req.user.id], 
 			function(err, rows, fields) {
 
 			// Connection is automatically released when query resolves
@@ -107,12 +99,12 @@ module.exports = {
         // }).end()
     },
 
-    deleteGameById(req, res) {
+    deleteGameById(req, res, next) {
         console.log('gameController.deleteGameById called')
 		
 		// For pool initialization, see above
-		pool.query("DELETE FROM games WHERE id = ?",
-			[req.params.id], 
+		pool.query("DELETE FROM games WHERE ID = ? && userID = ?",
+			[req.params.id, req.user.id], 
 			function(err, rows, fields) {
 
 			// Connection is automatically released when query resolves
@@ -120,20 +112,13 @@ module.exports = {
 				console.log(err)
 				return next(new ApiError(err, 500))
 			}
+			if(rows == "") {
+				return next(new ApiError('Object not found', 404))
+			}
 			res.status(200).json({ 
 				message: 'Game is deleted'
 			}).end()
 		 })
-
-        // games.forEach((item) => {
-        //     if(item.id == id) {
-        //         var index = games.indexOf(item)
-        //         games.splice(index, 1)
-        //         res.status(200).json({ 
-        //             message: item.name + ' succesvol verwijderd'
-        //         }).end()
-        //     }
-        // })
     }
 
 }

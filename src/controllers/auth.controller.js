@@ -59,6 +59,7 @@ module.exports = {
 					
 					console.log('Token is validated')
 		
+					res.set('x-access-token', token)
 					res.status(200).json({
 						result: {
 							firstname: rows[0].firstname,
@@ -87,8 +88,8 @@ module.exports = {
 	},
 
 	validateJWT(req, res, next) {
-		const token = require('../../test/authentication.test').token
-		// const token = req.header('x-access-token')
+		// const token = require('../../test/authentication.test').token
+		const token = req.header('x-access-token')
 		if(!token) {
 			return next(new ApiError('Required token is missing', 404))
 		}

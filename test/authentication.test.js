@@ -9,7 +9,7 @@ describe('AUTH API', () => {
     it('should return a token when email and password matches with database', (done) => {
  
         var user = {
-            email: 'tineke@mail.com',
+            email: 'user1@server.nl',
             password: 'secret'
         }
         chai.request(server)

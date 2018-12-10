@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const gameRoutes = require('./src/routes/game.routes')
 const authRoutes = require('./src/routes/auth.routes')
+const producerRoutes = require('./src/routes/producer.routes')
 const authController = require('./src/controllers/auth.controller')
 const ApiError = require('./src/models/apierror.model')
 
@@ -19,9 +20,11 @@ app.all('*', authController.validateJWT)
 
 // reguliere routing
 app.use('/api', gameRoutes)
+app.use('/api', producerRoutes)
 
 // handler voor niet-bestaande routes
 app.use('*', (req, res, next) => {
+	console.log('ohoh')
 	next(new ApiError('Non-existing endpoint', 404))
 })
 

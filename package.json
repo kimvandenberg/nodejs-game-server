@@ -4,7 +4,7 @@
   "description": "My first nodejs express app",
   "main": "server.js",
   "scripts": {
-    "start": "set DB_DATABASE=gamedb&& set DB_USER=gamedb_user&& nodemon server.js",
+    "start": "set DB_DATABASE=gamedb_test&& set DB_USER=gamedb_test_user&& set JWT_SECRET_KEY=blablabla123&& nodemon server.js",
     "test": "set DB_DATABASE=gamedb_test&& set DB_USER=gamedb_test_user&& set JWT_SECRET_KEY=blablabla123&& mocha --reporter spec --exit"
   },
   "keywords": [
